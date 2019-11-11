@@ -15,21 +15,23 @@ class Blockchain {
     this.chain.push(newBlock)
   }
 
-  static isValidChain(chain) {
-    if(chain.length == 0) {
-      return false
-    } else {
-      const fn = (isValid, curr, index) => {
-        if(index == 0) return JSON.stringify(curr) == JSON.stringify(Block.genesis())
-        else {
-          const prev = chain[index-1]
-          const { timestamp, lastHash, hash, data } = curr
-
-          return lastHash == prev.hash && cryptoHash(timestamp, lastHash, data) == hash && isValid
-        }
-      }
-      return chain.reduce(fn, true)
+  replaceChain(chain) {
+    if(chain.length > this.chain.length && Blockchain.isValidChain(chain)) {
+      this.chain = chain
     }
+  }
+
+  static isValidChain(chain) {
+    const fn = (isValid, curr, index) => {
+      if(index == 0) return JSON.stringify(curr) == JSON.stringify(Block.genesis())
+      else {
+        const prev = chain[index-1]
+        const { timestamp, lastHash, hash, data } = curr
+
+        return lastHash == prev.hash && cryptoHash(timestamp, lastHash, data) == hash && isValid
+      }
+    }
+    return chain.reduce(fn, false)
   }
 }
 
