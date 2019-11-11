@@ -29,9 +29,9 @@ class Blockchain {
       if(index == 0) return JSON.stringify(curr) == JSON.stringify(Block.genesis())
       else {
         const prev = chain[index-1]
-        const { timestamp, lastHash, hash, data } = curr
+        const { timestamp, lastHash, hash, data, nonce, difficulty } = curr
 
-        return lastHash == prev.hash && cryptoHash(timestamp, lastHash, data) == hash && isValid
+        return lastHash == prev.hash && cryptoHash(timestamp, lastHash, data, nonce, difficulty) == hash && isValid
       }
     }
     return chain.reduce(fn, false)
