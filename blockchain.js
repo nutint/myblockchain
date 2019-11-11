@@ -17,7 +17,10 @@ class Blockchain {
 
   replaceChain(chain) {
     if(chain.length > this.chain.length && Blockchain.isValidChain(chain)) {
+      console.log('Replacing chain')
       this.chain = chain
+    } else {
+      console.error('unable to replace chain')
     }
   }
 
