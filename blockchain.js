@@ -30,8 +30,9 @@ class Blockchain {
       else {
         const prev = chain[index-1]
         const { timestamp, lastHash, hash, data, nonce, difficulty } = curr
+        const jumpedDifficulty = Math.abs(difficulty - prev.difficulty) > 1
 
-        return lastHash == prev.hash && cryptoHash(timestamp, lastHash, data, nonce, difficulty) == hash && isValid
+        return lastHash == prev.hash && cryptoHash(timestamp, lastHash, data, nonce, difficulty) == hash && isValid && !jumpedDifficulty
       }
     }
     return chain.reduce(fn, false)
