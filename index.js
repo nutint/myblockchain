@@ -18,10 +18,13 @@ app.get('/api/blocks', (req, res) => {
 app.post('/api/mine', (req, res) => {
   const { data } = req.body
   blockchain.addBlock({data})
+  pubsub.broadcastChain()
   res.redirect('/api/blocks')
 })
 
-const port = 3000
+const DEFAULT_PORT=3000
+const port = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT + Math.ceil(Math.random() * 1000) : DEFAULT_PORT
+
 app.listen(port, () => {
   console.log(`application has started at localhost:${port}`)
 })
