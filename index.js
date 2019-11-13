@@ -40,5 +40,8 @@ const port = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT + Math.cei
 
 app.listen(port, () => {
   console.log(`application has started at localhost:${port}`)
-  syncChains()
+
+  if(port !== DEFAULT_PORT) {
+    syncChains()
+  }
 })
