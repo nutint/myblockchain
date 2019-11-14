@@ -3,7 +3,6 @@ const { verifySignature } = require('../util')
 
 class Transaction {
   constructor({ senderWallet, recipient, amount }) {
-    this.senderWallet = senderWallet
     this.recipient = recipient
     this.amount = amount
     this.id = uuid()
