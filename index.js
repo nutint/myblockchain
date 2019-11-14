@@ -10,7 +10,7 @@ const app = express()
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
 const wallet = new Wallet()
-const pubsub = new PubSub({blockchain})
+const pubsub = new PubSub({blockchain, transactionPool})
 
 const DEFAULT_PORT=3000
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`
@@ -38,10 +38,14 @@ app.post('/api/transact', (req, res) => {
     if(existingTransaction) {
       existingTransaction.update({ senderWallet: wallet, recipient, amount })
       transactionPool.setTransaction(existingTransaction)
+
+      pubsub.broadcastTransaction(existingTransaction)
       return res.json({ type: 'success', existingTransaction })
     } else {
       const transaction = wallet.createTransaction({ recipient, amount })
       transactionPool.setTransaction(transaction)
+
+      pubsub.broadcastTransaction(transaction)
       return res.json({ type: 'success', transaction })
     }
   } catch (error) {
@@ -53,12 +57,20 @@ app.get('/api/transaction-pool-map', (req, res) => {
   res.json(transactionPool.transactionMap)
 })
 
-const syncChains = () => {
+const syncWithRootState = () => {
   request({ url: `${ROOT_NODE_ADDRESS}/api/blocks`}, (error, response, body) => {
     if(!error && response.statusCode === 200) {
       const rootChain = JSON.stringify(body)
       console.log("replace chain on a sync with", rootChain)
       blockchain.replaceChain(rootChain)
+    }
+  })
+
+  request({ url: `${ROOT_NODE_ADDRESS}/api/transaction-pool-map` }, (error, response, body) => {
+    if(!error && response.statusCode === 200) {
+      const rootTransactionMap = JSON.parse(body)
+      console.log('replace transaction pool map on a sync with', rootTransactionMap)
+      transactionPool.setMap(rootTransactionMap)
     }
   })
 }
@@ -69,6 +81,7 @@ app.listen(port, () => {
   console.log(`application has started at localhost:${port}`)
 
   if(port !== DEFAULT_PORT) {
-    syncChains()
+    syncWithRootState()
+    
   }
 })
