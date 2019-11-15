@@ -47,6 +47,10 @@ class Wallet {
       outputTotal :
       STARTING_BALANCE + outputTotal
   }
+
+  validTransactionData({ chain }) {
+    
+  }
 }
 
 module.exports = Wallet
