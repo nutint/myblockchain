@@ -49,7 +49,7 @@ app.post('/api/transact', (req, res) => {
       pubsub.broadcastTransaction(existingTransaction)
       return res.json({ type: 'success', existingTransaction })
     } else {
-      const transaction = wallet.createTransaction({ recipient, amount })
+      const transaction = wallet.createTransaction({ recipient, amount, chain: blockchain.chain })
       transactionPool.setTransaction(transaction)
 
       pubsub.broadcastTransaction(transaction)
