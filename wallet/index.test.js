@@ -105,7 +105,7 @@ describe('Wallet', () => {
       })
     })
 
-    describe('amd there are outputs for the wallet', () => {
+    describe('and there are outputs for the wallet', () => {
       let transaction1, transaction2
 
       beforeEach(() => {
