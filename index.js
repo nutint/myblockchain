@@ -82,7 +82,7 @@ const syncWithRootState = () => {
     if(!error && response.statusCode === 200) {
       const rootChain = JSON.stringify(body)
       console.log("replace chain on a sync with", rootChain)
-      blockchain.replaceChain(rootChain)
+      blockchain.replaceChain(rootChain, true)
     }
   })
 

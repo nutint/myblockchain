@@ -32,7 +32,7 @@ class PubSub {
           this.transactionPool.clearBlockchainTransactions({
             chain: parsedMsg
           })
-        })
+        }, true)
         break
       case CHANNELS.TRANSACTION:
         this.transactionPool.setTransaction(parsedMsg)

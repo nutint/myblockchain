@@ -18,8 +18,10 @@ class Blockchain {
     this.chain.push(newBlock)
   }
 
-  replaceChain(chain, onSuccess) {
-    if(chain.length > this.chain.length && Blockchain.isValidChain(chain)) {
+  replaceChain(chain, onSuccess, validateTransactions = false) {
+    if(validateTransactions && !this.validTransactionData({ chain })) {
+      console.error("Invalid transaction data")
+    } else if(chain.length > this.chain.length && Blockchain.isValidChain(chain)) {
       console.log('Replacing chain')
       if(onSuccess) onSuccess()
       this.chain = chain
