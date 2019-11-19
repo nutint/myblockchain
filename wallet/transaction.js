@@ -13,6 +13,7 @@ class Transaction {
 
   createOutputMap({ senderWallet, recipient, amount }) {
     const outputMap = {}
+
     outputMap[recipient] = amount
     outputMap[senderWallet.publicKey] = senderWallet.balance - amount
 

@@ -1,6 +1,7 @@
 const Block = require('./block')
 const { cryptoHash } = require('../util')
 const { REWARD_INPUT, MINING_REWARD } = require('../config')
+const Wallet = require('../wallet')
 const Transaction = require('../wallet/transaction')
 
 class Blockchain {
@@ -47,6 +48,16 @@ class Blockchain {
         } else {
           if(!Transaction.validTransaction(transaction)) {
             console.error("Invalid transaction")
+            return false
+          }
+
+          const trueBalance = Wallet.calculateBalance({
+            chain: this.chain,
+            address: transaction.input.address
+          })
+
+          if(transaction.input.amount !== trueBalance) {
+            console.error('Invalid input amount')
             return false
           }
         }
