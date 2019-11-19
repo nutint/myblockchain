@@ -32,6 +32,7 @@ class Blockchain {
     for(let i=1; i<chain.length; ++i) {
       let rewardTransactionCount = 0
       const block = chain[i]
+      const transactionSet = new Set()
 
       for(let transaction of block.data) {
         if(transaction.input.address === REWARD_INPUT.address) {
@@ -59,6 +60,13 @@ class Blockchain {
           if(transaction.input.amount !== trueBalance) {
             console.error('Invalid input amount')
             return false
+          }
+
+          if(transactionSet.has(transaction)) {
+            console.log('An identical transaction appears more than once in the block')
+            return false
+          } else {
+            transactionSet.add(transaction)
           }
         }
       }
