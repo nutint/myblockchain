@@ -1,5 +1,6 @@
 const express = require('express')
 const request = require('request')
+const path = require('path')
 const Blockchain = require('./blockchain')
 const bodyParser = require('body-parser')
 const PubSub = require('./app/pubsub')
@@ -25,6 +26,7 @@ const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`
 setTimeout(() => pubsub.broadcastChain(), 1000)
 
 app.use(bodyParser.json())
+app.use(express.static(path.join(__dirname, 'client')))
 
 app.get('/api/blocks', (req, res) => {
   res.json(blockchain.chain)
@@ -94,6 +96,10 @@ const syncWithRootState = () => {
     }
   })
 }
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/index.html'))
+})
 
 const port = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT + Math.ceil(Math.random() * 1000) : DEFAULT_PORT
 
