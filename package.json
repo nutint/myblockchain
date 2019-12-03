@@ -19,16 +19,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
     "cross-env": "^6.0.3",
     "jest": "^24.9.0",
     "nodemon": "^1.19.4"
   },
   "dependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
     "body-parser": "^1.19.0",
     "elliptic": "^6.5.1",
     "express": "^4.17.1",
