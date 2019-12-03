@@ -7,6 +7,7 @@ const PubSub = require('./app/pubsub')
 const TransactionPool = require('./wallet/transaction-pool')
 const Wallet = require('./wallet')
 const TransactionMiner = require('./app/transaction-miner')
+const lodash = require('lodash')
 
 const app = express()
 const blockchain = new Blockchain()
@@ -100,6 +101,47 @@ const syncWithRootState = () => {
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'))
 })
+
+const walletFoo = new Wallet()
+const walletBar = new Wallet()
+
+const generateWalletTransaction = ({ wallet, recipient, amount }) => {
+  const transaction = wallet.createTransaction({
+    recipient,
+    amount,
+    chain: blockchain.chain
+  })
+
+  transactionPool.setTransaction(transaction)
+}
+
+const walletAction = () => generateWalletTransaction({
+  wallet, recipient: walletFoo.publicKey, amount: 5
+})
+
+const walletFooAction = () => generateWalletTransaction({
+  wallet: walletFoo, recipient: walletBar.publicKey, amount: 10
+})
+
+const walletBarAction = () => generateWalletTransaction({
+  wallet: walletBar, recipient: wallet.publicKey, amount: 15
+})
+
+lodash.range(10)
+  .forEach(elem => {
+    if(elem % 3 == 0) {
+      walletAction()
+      walletFooAction()
+    } else if (elem % 3 == 1) {
+      walletAction()
+      walletBarAction()
+    } else {
+      walletFooAction()
+      walletBarAction()
+    }
+
+    transactionMiner.mineTransactions()
+  })
 
 const port = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT + Math.ceil(Math.random() * 1000) : DEFAULT_PORT
 
