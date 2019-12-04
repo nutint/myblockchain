@@ -154,9 +154,9 @@ const generatedPort = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT +
 const PORT = process.env.PORT || generatedPort
 
 app.listen(PORT, () => {
-  console.log(`application has started at localhost:${port}`)
+  console.log(`application has started at localhost:${PORT}`)
 
-  if(port !== DEFAULT_PORT) {
+  if(PORT !== DEFAULT_PORT) {
     syncWithRootState()
     
   }
