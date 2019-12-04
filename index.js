@@ -9,20 +9,25 @@ const Wallet = require('./wallet')
 const TransactionMiner = require('./app/transaction-miner')
 const lodash = require('lodash')
 
+const isDevelopment = process.env.ENV === 'development'
+
+const DEFAULT_PORT=3000
+const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`
+const REDIS_URL = isDevelopment ?
+  'redis://127.0.0.1:6379' :
+  'redis://h:pad21cbc10a1c4f9b820cca1ea94e523575acda54cfe65d1a203edf121ad38944@ec2-52-205-156-44.compute-1.amazonaws.com:14449'
+
 const app = express()
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
 const wallet = new Wallet()
-const pubsub = new PubSub({blockchain, transactionPool})
+const pubsub = new PubSub({blockchain, transactionPool, redisUrl: REDIS_URL})
 const transactionMiner = new TransactionMiner({
   blockchain,
   transactionPool,
   wallet,
   pubsub
 })
-
-const DEFAULT_PORT=3000
-const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`
 
 setTimeout(() => pubsub.broadcastChain(), 1000)
 
@@ -102,50 +107,53 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'))
 })
 
-const walletFoo = new Wallet()
-const walletBar = new Wallet()
+if(isDevelopment) {
+  const walletFoo = new Wallet()
+  const walletBar = new Wallet()
 
-const generateWalletTransaction = ({ wallet, recipient, amount }) => {
-  const transaction = wallet.createTransaction({
-    recipient,
-    amount,
-    chain: blockchain.chain
+  const generateWalletTransaction = ({ wallet, recipient, amount }) => {
+    const transaction = wallet.createTransaction({
+      recipient,
+      amount,
+      chain: blockchain.chain
+    })
+
+    transactionPool.setTransaction(transaction)
+  }
+
+  const walletAction = () => generateWalletTransaction({
+    wallet, recipient: walletFoo.publicKey, amount: 5
   })
 
-  transactionPool.setTransaction(transaction)
+  const walletFooAction = () => generateWalletTransaction({
+    wallet: walletFoo, recipient: walletBar.publicKey, amount: 10
+  })
+
+  const walletBarAction = () => generateWalletTransaction({
+    wallet: walletBar, recipient: wallet.publicKey, amount: 15
+  })
+
+  lodash.range(10)
+    .forEach(elem => {
+      if(elem % 3 == 0) {
+        walletAction()
+        walletFooAction()
+      } else if (elem % 3 == 1) {
+        walletAction()
+        walletBarAction()
+      } else {
+        walletFooAction()
+        walletBarAction()
+      }
+
+      transactionMiner.mineTransactions()
+    })
 }
 
-const walletAction = () => generateWalletTransaction({
-  wallet, recipient: walletFoo.publicKey, amount: 5
-})
+const generatedPort = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT + Math.ceil(Math.random() * 1000) : DEFAULT_PORT
+const PORT = process.env.PORT || generatedPort
 
-const walletFooAction = () => generateWalletTransaction({
-  wallet: walletFoo, recipient: walletBar.publicKey, amount: 10
-})
-
-const walletBarAction = () => generateWalletTransaction({
-  wallet: walletBar, recipient: wallet.publicKey, amount: 15
-})
-
-lodash.range(10)
-  .forEach(elem => {
-    if(elem % 3 == 0) {
-      walletAction()
-      walletFooAction()
-    } else if (elem % 3 == 1) {
-      walletAction()
-      walletBarAction()
-    } else {
-      walletFooAction()
-      walletBarAction()
-    }
-
-    transactionMiner.mineTransactions()
-  })
-
-const port = process.env.GENERATE_PEER_PORT === 'true' ? DEFAULT_PORT + Math.ceil(Math.random() * 1000) : DEFAULT_PORT
-
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log(`application has started at localhost:${port}`)
 
   if(port !== DEFAULT_PORT) {
