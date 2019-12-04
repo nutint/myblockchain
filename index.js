@@ -15,7 +15,7 @@ const DEFAULT_PORT=3000
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`
 const REDIS_URL = isDevelopment ?
   'redis://127.0.0.1:6379' :
-  'redis://h:p3315a608e24678743d02ecde1fee484d4e52ba8b9fa1254d4da9ca32bd556fd7@ec2-34-195-104-225.compute-1.amazonaws.com:15859'
+  'redis://h:pad21cbc10a1c4f9b820cca1ea94e523575acda54cfe65d1a203edf121ad38944@ec2-52-205-156-44.compute-1.amazonaws.com:14449'
 
 const app = express()
 const blockchain = new Blockchain()
