@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "elliptic": "^6.5.1",
+    "elliptic": "^6.5.3",
     "express": "^4.17.1",
     "hex-to-binary": "^1.0.1",
     "history": "^4.10.1",
